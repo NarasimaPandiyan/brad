@@ -1,0 +1,2 @@
+HRecord,Perc,Interrupt,Age,Sexe,Height,Weight,BPS_24,BPD_24,BPS_Day24,BPD_Day24,BPS_Night24,BPD_Night24,BPS_load_Day,BPD_load_Day,BPS_load_Night,BPD_load_Night,Max_Sys,Min_Sys,Max_Dia,Min_Dia,Sys_Night_Des,Dia_Night_Des,BPS_CV_all,BPD_CV_all,BPS_CV_Day,BPD_CV_Day,BPS_CV_Night,BPD_CV_Night,BPS_wakeUp,BPD_wakeUp,low_BPS_Night,low_BPD_Night
+23.0,0.5,0,24,0,160,45,5,5,5,5,5,5,1,5.3,1,9.1,170,81,95,41,9.0,8.7,12.9,14.5,13.0,14.5,7.0,11.8,123,83,90,49
