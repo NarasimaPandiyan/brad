@@ -1,14 +1,18 @@
-from flask import Flask, render_template, request, redirect, url_for, jsonify
+from flask import Flask, render_template, request, redirect, jsonify, url_for
 import os
 import joblib
 import pandas as pd
+import json
 import random
+import uuid  # Import the uuid module for generating unique IDs
 
 app = Flask(__name__)
 
-# Specify the folder for storing models
+# Specify the folder for storing models and results
 MODELS_FOLDER = 'models'
+RESULTS_FOLDER = 'results'
 app.config['MODELS_FOLDER'] = MODELS_FOLDER
+app.config['RESULTS_FOLDER'] = RESULTS_FOLDER
 
 # List of tips for hypertension
 TIPS_FOR_HYPERTENSION = [
@@ -44,6 +48,28 @@ def allowed_file(filename):
     ALLOWED_EXTENSIONS = {'csv'}
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
+# Function to write results and tips to a JSON file
+# Function to write results and tips to a JSON file
+def write_results_to_json(results, tips):
+    result_id = str(uuid.uuid4())  # Generate a unique ID for the result set
+    result_filename = f'result_{result_id}.json'
+    result_path = os.path.join(app.config['RESULTS_FOLDER'], result_filename)
+
+    # Convert NumPy int64 types to standard Python int
+    for result in results:
+        result['Age'] = int(result['Age'])
+
+    result_data = {
+        'results': results,
+        'tips': tips
+    }
+
+    with open(result_path, 'w+') as json_file:
+        json.dump(result_data, json_file, default=str)  # Use default=str to handle other non-serializable types
+
+    return result_id
+
+
 @app.route('/')
 def index():
     return render_template('upload_form.html')
@@ -56,7 +82,7 @@ def upload_file():
     
     file = request.files['file']
 
-    # If the user does not select a file, browser may also submit an empty part without a filename
+    # If the user does not select a file, the browser may also submit an empty part without a filename
     if file.filename == '':
         return redirect(request.url)
 
@@ -70,20 +96,64 @@ def upload_file():
         model_path = os.path.join(app.config['MODELS_FOLDER'], model_filename)
         loaded_model = joblib.load(model_path)
 
-        # Perform prediction
-        predictions = loaded_model.predict(csv_data)
+        # Create a list to store results for each row
+        results = []
+
+        for _, row in csv_data.iterrows():
+            # Extract relevant features
+            age = row['Age']
+            sex = row['Sexe']
+            height = row['Height']
+            weight = row['Weight']
+
+            # Calculate BMI
+            bmi = weight / ((height / 100) ** 2)
+
+            # Perform prediction
+            prediction = loaded_model.predict([row])[0]
+
+            # Create a dictionary for each row's result
+            result_dict = {
+                'Age': age,
+                'Sex': sex,
+                'Height': height,
+                'Weight': weight,
+                'BMI': bmi,
+                'Prediction': prediction
+            }
+
+            # Append the dictionary to the results list
+            results.append(result_dict)
 
         # Get random tips for hypertension
         tips = get_random_tips()
 
-        # Display the predictions and tips
-        return render_template('prediction_result.html', predictions=predictions.tolist(), tips=tips)
+        # Write results and tips to a JSON file, get the unique ID
+        result_id = write_results_to_json(results, tips)
+
+        # Redirect to the result page with the unique ID
+        return redirect(url_for('result_page', result_id=result_id))
 
     return 'Invalid file type. Allowed file type is: csv'
 
+@app.route('/result/<result_id>')
+def result_page(result_id):
+    # Load results and tips from the JSON file based on the provided ID
+    result_filename = f'result_{result_id}.json'
+    result_path = os.path.join(app.config['RESULTS_FOLDER'], result_filename)
+
+    try:
+        with open(result_path, 'r') as json_file:
+            result_data = json.load(json_file)
+    except FileNotFoundError:
+        return 'Result not found.'
+
+    return render_template('result_page.html', results=result_data['results'], tips=result_data['tips'])
+
 if __name__ == '__main__':
-    # Create the 'models' folder if it doesn't exist
-    if not os.path.exists(MODELS_FOLDER):
-        os.makedirs(MODELS_FOLDER)
+    # Create the 'models' and 'results' folders if they don't exist
+    for folder in [MODELS_FOLDER, RESULTS_FOLDER]:
+        if not os.path.exists(folder):
+            os.makedirs(folder)
 
     app.run(debug=True)
