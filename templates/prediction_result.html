@@ -30,11 +30,11 @@
     {% for prediction in predictions %}
         {% if prediction == 0 %}
             <div class="alert alert-primary" role="alert">
-                YES!! No hypertension BABY!!! <a href="#" class="alert-link">Give some feedback</a>
+                You are a legend, you maintained your blood pressure, well enough.. <a href="#" class="alert-link">Give some feedback</a>
             </div>
         {% else %}
             <div class="alert alert-danger" role="alert">
-                NO!! Calm the f*** down...  <a href="#" class="alert-link">Go get some help</a>
+                Hey, You have Hypertension...  <a href="#" class="alert-link">Go get some help</a>
             </div>
             <h5>Tips for Managing Hypertension:</h5>
             {% for tip in tips %}

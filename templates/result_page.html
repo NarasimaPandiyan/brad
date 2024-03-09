@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>Result Page</title>
+    <!-- Add Bootstrap CSS link here -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+</head>
+<body>
+
+<div class="container mt-4">
+    <h2>Result Page</h2>
+
+    <!-- Display Results -->
+    <div class="mt-4">
+        <h4>Results:</h4>
+        <ul>
+            {% for result in results %}
+                <li>
+                    Age: {{ result.Age }} 
+                    
+                </li>
+                <li>
+                    , Sex: {{ result.Sex }},
+                </li>
+                <li>
+                    Height: {{ result.Height }},
+                </li>
+                <li>
+                    Weight: {{ result.Weight }},
+                </li>
+                <li>
+                    BMI: {{ result.BMI }}
+                </li>
+                , Prediction: {{ result.Prediction }}
+            {% endfor %}
+        </ul>
+    </div>
+
+    <!-- Display Tips -->
+    <div class="mt-4">
+        <h4>Tips for Hypertension:</h4>
+        <ul>
+            {% for tip in tips %}
+                <li>{{ tip }}</li>
+            {% endfor %}
+        </ul>
+    </div>
+
+    <!-- Navigation Buttons -->
+    <div class="mt-4">
+        <div class="btn-group" role="group" aria-label="Navigation">
+            {% if result_id != 'first' %}
+                <a href="{{ url_for('result_page', result_id='first') }}" class="btn btn-secondary">First</a>
+                <a href="{{ url_for('result_page', result_id=prev_result_id) }}" class="btn btn-primary">Previous</a>
+            {% endif %}
+            {% if result_id != 'last' %}
+                <a href="{{ url_for('result_page', result_id=next_result_id) }}" class="btn btn-primary">Next</a>
+                <a href="{{ url_for('result_page', result_id='last') }}" class="btn btn-secondary">Last</a>
+            {% endif %}
+        </div>
+    </div>
+
+</div>
+
+<!-- Add Bootstrap JS and Popper.js links here -->
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.10.2/dist/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+</body>
+</html>

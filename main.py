@@ -50,25 +50,27 @@ def allowed_file(filename):
 
 # Function to write results and tips to a JSON file
 # Function to write results and tips to a JSON file
-def write_results_to_json(results, tips):
-    result_id = str(uuid.uuid4())  # Generate a unique ID for the result set
-    result_filename = f'result_{result_id}.json'
-    result_path = os.path.join(app.config['RESULTS_FOLDER'], result_filename)
+def write_results_to_json(results):
+
 
     # Convert NumPy int64 types to standard Python int
     for result in results:
         result['Age'] = int(result['Age'])
 
-    result_data = {
-        'results': results,
-        'tips': tips
-    }
+    result_id = 1  # Generate a unique ID for the result set  
+    for row in results:
+        
+        result_filename = f'result_{result_id}.json'
+        result_path = os.path.join(app.config['RESULTS_FOLDER'], result_filename)
+        result_data = {
+            'results': row,
+            'tips': get_random_tips()
+        }
 
-    with open(result_path, 'w+') as json_file:
-        json.dump(result_data, json_file, default=str)  # Use default=str to handle other non-serializable types
-
-    return result_id
-
+        with open(result_path, 'w+') as json_file:
+            json.dump(result_data, json_file, default=str)  # Use default=str to handle other non-serializable types
+        result_id+=1
+        
 
 @app.route('/')
 def index():
@@ -125,14 +127,12 @@ def upload_file():
             # Append the dictionary to the results list
             results.append(result_dict)
 
-        # Get random tips for hypertension
-        tips = get_random_tips()
-
         # Write results and tips to a JSON file, get the unique ID
-        result_id = write_results_to_json(results, tips)
+        print(results)
+        write_results_to_json(results)
 
         # Redirect to the result page with the unique ID
-        return redirect(url_for('result_page', result_id=result_id))
+        return redirect(url_for('result_page', result_id=1))
 
     return 'Invalid file type. Allowed file type is: csv'
 
