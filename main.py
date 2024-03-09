@@ -53,8 +53,8 @@ def allowed_file(filename):
 # Function to write results and tips to a JSON file
 # Function to write results and tips to a JSON file
 def write_results_to_json(results):
-
-
+    if not os.path.exists('results'):
+        os.makedirs('results')
     # Convert NumPy int64 types to standard Python int
     for result in results:
         result['Age'] = int(result['Age'])
