@@ -16,27 +16,28 @@
     <div class="mt-4">
         <h4>Results:</h4>
         <ul>
-            {% for result in results %}
-                <li>
-                    Age: {{ result.Age }} 
-                    
-                </li>
-                <li>
-                    , Sex: {{ result.Sex }},
-                </li>
-                <li>
-                    Height: {{ result.Height }},
-                </li>
-                <li>
-                    Weight: {{ result.Weight }},
-                </li>
-                <li>
-                    BMI: {{ result.BMI }}
-                </li>
-                , Prediction: {{ result.Prediction }}
-            {% endfor %}
+            <li>
+                Age: {{ results.Age }} 
+            </li>
+            <li>
+                Sex: {% if results.Sex == 0 %}Male{% else %}Female{% endif %}
+            </li>
+            <li>
+                Height: {{ results.Height }}
+            </li>
+            <li>
+                Weight: {{ results.Weight }}
+            </li>
+            <li>
+                BMI: {{ results.BMI|round(1) }}
+            </li>
+            <li>
+                Hypertension? : {% if results.Prediction == "0" %}No{% else %}Yes{% endif %}
+            </li>
         </ul>
     </div>
+    
+    {% if results.Prediction == "1"%}
 
     <!-- Display Tips -->
     <div class="mt-4">
@@ -47,20 +48,18 @@
             {% endfor %}
         </ul>
     </div>
+    {%endif%}
 
-    <!-- Navigation Buttons -->
-    <div class="mt-4">
-        <div class="btn-group" role="group" aria-label="Navigation">
-            {% if result_id != 'first' %}
-                <a href="{{ url_for('result_page', result_id='first') }}" class="btn btn-secondary">First</a>
-                <a href="{{ url_for('result_page', result_id=prev_result_id) }}" class="btn btn-primary">Previous</a>
-            {% endif %}
-            {% if result_id != 'last' %}
-                <a href="{{ url_for('result_page', result_id=next_result_id) }}" class="btn btn-primary">Next</a>
-                <a href="{{ url_for('result_page', result_id='last') }}" class="btn btn-secondary">Last</a>
-            {% endif %}
-        </div>
+ <!-- Navigation Buttons -->
+<div class="mt-4">
+    <div class="btn-group" role="group" aria-label="Navigation">
+        <a href="{{ url_for('result_page', result_id=1) }}" class="btn btn-secondary">First</a>
+        <a href="{{ url_for('result_page', result_id=meta.cur_id - 1) }}" class="btn btn-primary">Previous</a>
+        <a href="{{ url_for('result_page', result_id=meta.cur_id + 1) }}" class="btn btn-primary">Next</a>
+        <a href="{{ url_for('result_page', result_id=meta.size) }}" class="btn btn-secondary">Last</a>
     </div>
+</div>
+
 
 </div>
 

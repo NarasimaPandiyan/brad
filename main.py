@@ -4,7 +4,8 @@ import joblib
 import pandas as pd
 import json
 import random
-import uuid  # Import the uuid module for generating unique IDs
+from sklearn.preprocessing import MinMaxScaler
+import shutil
 
 app = Flask(__name__)
 
@@ -13,6 +14,7 @@ MODELS_FOLDER = 'models'
 RESULTS_FOLDER = 'results'
 app.config['MODELS_FOLDER'] = MODELS_FOLDER
 app.config['RESULTS_FOLDER'] = RESULTS_FOLDER
+meta = {'size':0,'cur_id':1}
 
 # List of tips for hypertension
 TIPS_FOR_HYPERTENSION = [
@@ -92,21 +94,33 @@ def upload_file():
     if file and allowed_file(file.filename):
         # Read the CSV file directly
         csv_data = pd.read_csv(file)
-
         # Load the saved model
         model_filename = 'gnb.joblib'  # Change this to your actual model filename
         model_path = os.path.join(app.config['MODELS_FOLDER'], model_filename)
         loaded_model = joblib.load(model_path)
 
+        meta['size'] = len(csv_data)
+        selected_columns = ['HRecord', 'Perc', 'Interrupt', 'Age', 'Sexe', 'Height', 'Weight',
+            'BPS_24', 'BPD_24', 'BPS_Day24', 'BPD_Day24', 'BPS_Night24',
+            'BPD_Night24', 'BPS_load_Day', 'BPD_load_Day', 'BPS_load_Night',
+            'BPD_load_Night', 'Max_Sys', 'Min_Sys', 'Max_Dia', 'Min_Dia',
+            'Sys_Night_Des', 'Dia_Night_Des', 'BPS_CV_all', 'BPD_CV_all',
+            'BPS_CV_Day', 'BPD_CV_Day', 'BPS_CV_Night', 'BPD_CV_Night',
+            'BPS_wakeUp', 'BPD_wakeUp', 'low_BPS_Night', 'low_BPD_Night']
+        
+        csv_data = csv_data[selected_columns]
+
+        scaler = MinMaxScaler()
+        scaled_data = pd.DataFrame(scaler.fit_transform(X=csv_data))
         # Create a list to store results for each row
         results = []
 
-        for _, row in csv_data.iterrows():
+        for i, row in scaled_data.iterrows():
             # Extract relevant features
-            age = row['Age']
-            sex = row['Sexe']
-            height = row['Height']
-            weight = row['Weight']
+            age = csv_data.iloc[i]['Age']
+            sex = csv_data.iloc[i]['Sexe']
+            height = csv_data.iloc[i]['Height']
+            weight = csv_data.iloc[i]['Weight']
 
             # Calculate BMI
             bmi = weight / ((height / 100) ** 2)
@@ -128,7 +142,6 @@ def upload_file():
             results.append(result_dict)
 
         # Write results and tips to a JSON file, get the unique ID
-        print(results)
         write_results_to_json(results)
 
         # Redirect to the result page with the unique ID
@@ -146,9 +159,26 @@ def result_page(result_id):
         with open(result_path, 'r') as json_file:
             result_data = json.load(json_file)
     except FileNotFoundError:
-        return 'Result not found.'
+        return redirect(url_for('result_page', result_id=1))
+    meta['cur_id'] = int(result_id)
+    return render_template('result_page.html', results=result_data['results'], tips=result_data['tips'], meta=meta)
 
-    return render_template('result_page.html', results=result_data['results'], tips=result_data['tips'])
+# @app.before_request
+# def delete_results_folder():
+#     # Check if the user is navigating away from the results page
+#     if request.endpoint == 'result' not in request.args:
+#         # User is exiting the results page, delete the contents of the results folder
+#         results_folder = app.config['RESULTS_FOLDER']
+#         for filename in os.listdir(results_folder):
+#             file_path = os.path.join(results_folder, filename)
+#             try:
+#                 if os.path.isfile(file_path) or os.path.islink(file_path):
+#                     os.unlink(file_path)
+#                 elif os.path.isdir(file_path):
+#                     shutil.rmtree(file_path)
+#             except Exception as e:
+#                 print(f"Error deleting {file_path}: {e}")
+#         print("Contents of the results folder deleted.")
 
 if __name__ == '__main__':
     # Create the 'models' and 'results' folders if they don't exist
