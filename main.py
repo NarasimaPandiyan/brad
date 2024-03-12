@@ -39,10 +39,44 @@ TIPS_FOR_HYPERTENSION = [
     "Consult with a healthcare professional for personalized advice."
 ]
 
+points = {
+    "Celebrate Your Health": [
+        "Acknowledge the strength within you.",
+        "You are healthy, vibrant, and resilient.",
+        "Your body's incredible capacity for balance and renewal."
+    ],
+    "Free from Ailments": [
+        "You stand tall, free from hypertension or any other health concerns.",
+        "Your path forward is clear, unobstructed by health issues."
+    ],
+    "Push Forward with Vigor": [
+        "Embrace every opportunity with renewed vigor.",
+        "Pursue your passions, achieve your goals, and savor life's beauty.",
+        "Let nothing hold you back."
+    ],
+    "Nurturing Your Health": [
+        "Your health is your most precious asset.",
+        "Nurture it with care, nourish it with wholesome choices, and cherish it with gratitude.",
+        "Draw upon your inner resilience to conquer adversity."
+    ],
+    "Illuminate the Path Ahead": [
+        "Let your healthy glow guide you forward.",
+        "Inspire others to embrace their vitality and push forward with determination."
+    ]
+}
+def random_message():
+    # Choose a random main point (key)
+    main_point = random.choice(list(points.keys()))
+    
+    # Get the sub-points (values) associated with the chosen main point
+    sub_points_list = points[main_point]
+    
+    return main_point, sub_points_list
+
 # Function to randomly select 2 or 3 tips
 def get_random_tips():
     random.shuffle(TIPS_FOR_HYPERTENSION)
-    return TIPS_FOR_HYPERTENSION[:3]
+    return TIPS_FOR_HYPERTENSION[:5]
 
 # Function to check if the file has an allowed extension
 def allowed_file(filename):
@@ -76,7 +110,8 @@ def write_results_to_json(results):
         result_path = os.path.join(app.config['RESULTS_FOLDER'], result_filename)
         result_data = {
             'results': row,
-            'tips': get_random_tips()
+            'tips': get_random_tips(),
+            'msg' : random_message()
         }
 
         with open(result_path, 'w+') as json_file:
@@ -171,7 +206,7 @@ def result_page(result_id):
     except FileNotFoundError:
         return redirect(url_for('result_page', result_id=1))
     meta['cur_id'] = int(result_id)
-    return render_template('result_page.html', results=result_data['results'], tips=result_data['tips'], meta=meta)
+    return render_template('result_page.html', results=result_data['results'], tips=result_data['tips'], meta=meta,msg=result_data['msg'])
 
 if __name__ == '__main__':
     # Create the 'models' and 'results' folders if they don't exist
