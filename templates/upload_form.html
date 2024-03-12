@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-bs-theme="dark">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -10,12 +10,12 @@
 </head>
 <body>
 
-<nav class="navbar navbar-expand-lg navbar-light bg-light">
+<nav class="navbar navbar-expand-lg navbar-dark bg-secondary">
     <div class="container">
         <a class="navbar-brand" href="{{ url_for('index') }}">File Upload</a>
     </div>
 </nav>
-
+<h1 class="text-danger text-center my-3">Blood Pressure Prediction</h1>
 <div class="container mt-5">
     
     <form method="POST" action="{{ url_for('upload_file') }}" enctype="multipart/form-data">
