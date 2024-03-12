@@ -1,0 +1,4 @@
+HRecord,Perc,Interrupt,Age,Sexe,Height,Weight,BPS_24,BPD_24,BPS_Day24,BPD_Day24,BPS_Night24,BPD_Night24,BPS_load_Day,BPD_load_Day,BPS_load_Night,BPD_load_Night,Max_Sys,Min_Sys,Max_Dia,Min_Dia,Sys_Night_Des,Dia_Night_Des,BPS_CV_all,BPD_CV_all,BPS_CV_Day,BPD_CV_Day,BPS_CV_Night,BPD_CV_Night,BPS_wakeUp,BPD_wakeUp,low_BPS_Night,low_BPD_Night,Validity,Circadian_Rythm,Pulse_Pressure,BP_Variability,BP_Load,Morning_Surge
+23,0.5,0,24,0,160,45,113.7,66.9,114.9,67.5,104.5,61.6,9.4,5.3,0,9.1,170,81,95,41,9,8.7,12.9,14.5,13,14.5,7,11.8,123,83,90,49,1,1,1,1,0,0
+24,17.8,0,63,1,166,76,130.2,72.5,137.7,78.6,114.3,59.4,63.3,28.3,10.7,10.7,165,90,123,44,17,24.3,13.5,21.6,10.7,18.5,9.9,13.9,132,87,102,45,1,0,0,1,1,0
+24,3.3,0,39,1,166,76,135,90.6,135.2,90.6,133.9,90.9,47.9,59.2,100,100,203,95,168,48,0.9,-0.3,10.2,16.4,11.2,18,3.6,6.4,126,77,126,89,1,1,1,1,1,0

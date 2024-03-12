@@ -1,11 +1,10 @@
 from flask import Flask, render_template, request, redirect, jsonify, url_for
-import os
+import os, shutil
 import joblib
 import pandas as pd
 import json
 import random
 from sklearn.preprocessing import MinMaxScaler
-import shutil
 
 app = Flask(__name__)
 
@@ -55,6 +54,17 @@ def allowed_file(filename):
 def write_results_to_json(results):
     if not os.path.exists('results'):
         os.makedirs('results')
+    else:
+        folder = 'results'#
+        for filename in os.listdir(folder):
+            file_path = os.path.join(folder, filename)
+            try:
+                if os.path.isfile(file_path) or os.path.islink(file_path):
+                    os.unlink(file_path)
+                elif os.path.isdir(file_path):
+                    shutil.rmtree(file_path)
+            except Exception as e:
+                print('Failed to delete %s. Reason: %s' % (file_path, e))
     # Convert NumPy int64 types to standard Python int
     for result in results:
         result['Age'] = int(result['Age'])
@@ -162,23 +172,6 @@ def result_page(result_id):
         return redirect(url_for('result_page', result_id=1))
     meta['cur_id'] = int(result_id)
     return render_template('result_page.html', results=result_data['results'], tips=result_data['tips'], meta=meta)
-
-# @app.before_request
-# def delete_results_folder():
-#     # Check if the user is navigating away from the results page
-#     if request.endpoint == 'result' not in request.args:
-#         # User is exiting the results page, delete the contents of the results folder
-#         results_folder = app.config['RESULTS_FOLDER']
-#         for filename in os.listdir(results_folder):
-#             file_path = os.path.join(results_folder, filename)
-#             try:
-#                 if os.path.isfile(file_path) or os.path.islink(file_path):
-#                     os.unlink(file_path)
-#                 elif os.path.isdir(file_path):
-#                     shutil.rmtree(file_path)
-#             except Exception as e:
-#                 print(f"Error deleting {file_path}: {e}")
-#         print("Contents of the results folder deleted.")
 
 if __name__ == '__main__':
     # Create the 'models' and 'results' folders if they don't exist
